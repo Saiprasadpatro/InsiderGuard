@@ -1,0 +1,11 @@
+user_id,timestamp,action
+u1,2023-05-01 10:15:00,login
+u1,2023-05-01 10:20:00,download
+u2,2023-05-01 11:00:00,login
+u001,2025-08-28 09:00:00,login
+u001,2025-08-28 09:05:00,download_confidential
+u002,2025-08-28 09:10:00,login
+u002,2025-08-28 09:12:00,failed_login
+u002,2025-08-28 09:13:00,failed_login
+u002,2025-08-28 09:14:00,failed_login
+u002,2025-08-28 09:20:00,access_restricted
