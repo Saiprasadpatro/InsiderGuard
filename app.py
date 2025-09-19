@@ -1,4 +1,4 @@
-import os  # add this if not already imported
+import os  
 
 USB_LOG_FILE = "data/usb_logs.csv"
 
@@ -27,7 +27,7 @@ st_autorefresh(interval=5000, limit=None, key="usb_refresh")
 # ---------------------------
 st.set_page_config(page_title="InsiderGuard", page_icon="🛡️", layout="wide")
 st.title("🛡️ InsiderGuard — Insider Threat Monitoring")
-st.caption("Software-only demo: simulated logs → detection → risk → alerts")
+st.caption("Software-only: live logs → detection → risk → alerts")
 
 # ---------------------------
 # Military Theme (CSS Injection)
