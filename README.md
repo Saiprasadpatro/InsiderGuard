@@ -1,10 +1,10 @@
 # InsiderGuard
 
-A 24-hour hackathon-ready project that detects **insider threats** using simulated or ingested logs, **unsupervised anomaly detection** (IsolationForest), **explainable rule checks**, **risk scoring**, and a **Streamlit dashboard**.
+InsiderGuard is a production ready project that detects **insider threats** using ingested real logs, **unsupervised anomaly detection** (IsolationForest), **explainable rule checks**, **risk scoring**, and a **Streamlit dashboard**.
 
 ## ⭐ Features
 
-- Data simulator for realistic defence-style user activity logs
+- Real-time ingestion and analysis of defense-style user activity logs
 - Per-user baselines & feature engineering
 - Anomaly detection (IsolationForest + z-score features)
 - Rule engine (file/data spikes, off-hours logins, restricted access, failed logins)
@@ -53,6 +53,8 @@ utils.py # UI helpers
 data/
 seed_users.csv # Generated on first run
 sample_logs.csv # Simulated logs
+usb_logs.csv #Live USB Events logs
+
 ```
 
 ## 🔁 Typical Demo Flow
