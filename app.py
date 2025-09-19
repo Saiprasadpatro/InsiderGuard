@@ -9,6 +9,8 @@ from core.rules import RuleEngine
 from core.risk import RiskScorer
 from core.alerts import AlertManager
 from core.utils import pretty_time, cache_clear_button
+from core.usb_monitor import start_usb_monitor
+start_usb_monitor()  # start USB + file monitoring in background
 
 # ---------------------------
 # Streamlit UI setup
@@ -16,6 +18,59 @@ from core.utils import pretty_time, cache_clear_button
 st.set_page_config(page_title="InsiderGuard", page_icon="🛡️", layout="wide")
 st.title("🛡️ InsiderGuard — Insider Threat Monitoring")
 st.caption("Software-only demo: simulated logs → detection → risk → alerts")
+
+# ---------------------------
+# Military Theme (CSS Injection)
+# ---------------------------
+st.markdown(
+    """
+    <style>
+    /* Background */
+    .stApp {
+        background-color: #0d1b0d; /* dark green military style */
+        color: #e0e0e0;
+    }
+
+    /* Titles */
+    h1, h2, h3 {
+        color: #76c893 !important; /* army green shade */
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: #1a2d1a;
+        color: #e0e0e0;
+    }
+
+    /* Buttons */
+    button[kind="primary"] {
+        background-color: #2e5339;
+        color: white;
+        border-radius: 6px;
+        border: 1px solid #76c893;
+    }
+    button[kind="primary"]:hover {
+        background-color: #76c893;
+        color: black;
+    }
+
+    /* Dataframes */
+    .stDataFrame {
+        background-color: #122112;
+    }
+
+    /* Alerts styling */
+    .stAlert {
+        border-radius: 8px;
+        font-weight: bold;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # Sidebar actions
 with st.sidebar:
