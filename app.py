@@ -1,5 +1,11 @@
+import os  # add this if not already imported
+
+USB_LOG_FILE = "data/usb_logs.csv"
+
 import pandas as pd
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
+
 
 from core.config import DATA_DIR, LOG_PATH, ALERTS_PATH, RANDOM_SEED
 from core.data_loader import ensure_data_ready, load_logs
@@ -11,6 +17,10 @@ from core.alerts import AlertManager
 from core.utils import pretty_time, cache_clear_button
 from core.usb_monitor import start_usb_monitor
 start_usb_monitor()  # start USB + file monitoring in background
+
+# Auto-refresh every 5 seconds for real-time USB monitoring
+st_autorefresh(interval=5000, limit=None, key="usb_refresh")
+
 
 # ---------------------------
 # Streamlit UI setup
@@ -91,7 +101,22 @@ with st.sidebar:
 # Load / Prepare data
 # ---------------------------
 ensure_data_ready(regenerate=(mode == "(Re)generate simulated data"))
+#logs = load_logs(LOG_PATH)
+# Load main logs
 logs = load_logs(LOG_PATH)
+
+# Load USB logs if available
+if os.path.exists(USB_LOG_FILE):
+    usb_logs = pd.read_csv(USB_LOG_FILE)
+
+    # Ensure same schema for merging
+    for col in ["date", "user_id", "action", "resource"]:
+        if col not in usb_logs.columns:
+            usb_logs[col] = "N/A"
+
+    # Merge both logs
+    logs = pd.concat([logs, usb_logs], ignore_index=True)
+
 
 if logs.empty:
     st.error("No logs available. Try regenerating simulated data from the sidebar.")
@@ -149,6 +174,15 @@ if not alerts.empty:
     st.dataframe(alerts)
 else:
     st.success("✅ No insider threats detected.")
+    
+    # ---------------------------
+# USB Alerts (Real-time monitoring)
+# ---------------------------
+if os.path.exists(USB_LOG_FILE):
+    st.subheader("💾 USB Activity Logs")
+    usb_logs = pd.read_csv(USB_LOG_FILE)
+    st.dataframe(usb_logs.tail(10), use_container_width=True)  # latest 10 entries
+
 
 
 # ---------------------------
