@@ -16,7 +16,7 @@ InsiderGuard is a production ready project that detects **insider threats** usin
 
 - **Python 3.10+**
 - **Streamlit** (dashboard)
-- **scikit-learn**, **pandas**, **numpy**
+- **scikit-learn**, **pandas**, **numpy**, **IsolationForest**
 
 ## 📦 Setup
 
@@ -49,6 +49,7 @@ detector.py # IsolationForest wrapper
 rules.py # Explainable rule checks
 risk.py # Risk aggregation
 alerts.py # Alerts persistence
+usb_monitor.py # It helps in detecting USB logs address
 utils.py # UI helpers
 data/
 seed_users.csv # Generated on first run
@@ -64,7 +65,7 @@ usb_logs.csv #Live USB Events logs
 3. View **Risk Overview**, **Alerts**, and **User Drilldowns**.
 4. Tweak **contamination** to adjust sensitivity.
 
-## 🧪 Bring Your Own Data (optional)
+## 🧪 Bring Your Own Data (optional) / It's also detects realtime logs
 
 Replace `data/sample_logs.csv` with your own logs having these columns:
 
@@ -78,7 +79,7 @@ timestamp,date,user_id,files_accessed,data_mb,failed_logins,accessed_folder,is_r
 
 ## 🔒 Notes
 
-- This is a **demo/prototype** for hackathon use. For production, add authentication, RBAC, secure storage, and proper MLOps.
+- This is a **Live prototype** for hackathon use. If you want it for production, add authentication, RBAC, secure storage, and proper MLOps ,port into c++ for better security with no tamper with the software solution, which we will convert/update that in the future.
 
 ## 🧑‍💻 Author & License
 
