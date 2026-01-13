@@ -25,6 +25,7 @@ def build_feature_table(logs: pd.DataFrame) -> pd.DataFrame:
     ).reset_index()
 
     # Normalized features
+    # Different sections
     grp["files_per_mb"] = grp["files_accessed"] / (grp["data_mb"] + 1e-6)
     for col in ["files_accessed", "data_mb", "failed_logins"]:
         grp[f"z_{col}"] = (grp[col] - grp[col].mean()) / (grp[col].std() + 1e-6)
