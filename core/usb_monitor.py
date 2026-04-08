@@ -1,4 +1,3 @@
-import win32file
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -6,6 +5,7 @@ import threading
 import datetime
 import pandas as pd
 import os
+import platform
 
 
 LOG_FILE = "data/usb_logs.csv"  # USB log file
@@ -15,7 +15,14 @@ LOG_FILE = "data/usb_logs.csv"  # USB log file
 class WatcherHandler(FileSystemEventHandler):
     def log_event(self, event_type, path):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        user_id = os.getlogin()  # current logged-in user
+        
+        # Cross-platform user detection
+        try:
+            user_id = os.getlogin()
+        except OSError:
+            # Fallback for headless/cloud environments
+            user_id = os.environ.get("USER", os.environ.get("USERNAME", "unknown"))
+        
         log_data = {
             "timestamp": timestamp,
             "user_id": user_id,
@@ -46,48 +53,64 @@ class WatcherHandler(FileSystemEventHandler):
 
 
 def detect_usb():
-    drive_list = []
-    drivebits = win32file.GetLogicalDrives()
-    for d in range(1, 26):
-        mask = 1 << d
-        if drivebits & mask:
-            drname = '%c:\\' % chr(ord('A') + d)
-            t = win32file.GetDriveType(drname)
-            if t == win32file.DRIVE_REMOVABLE:
-                drive_list.append(drname)
-    return drive_list
+    """Detect USB drives (Windows only)"""
+    if platform.system() != "Windows":
+        return []  # No USB detection on Linux/macOS in Streamlit
+    
+    try:
+        import win32file
+        drive_list = []
+        drivebits = win32file.GetLogicalDrives()
+        for d in range(1, 26):
+            mask = 1 << d
+            if drivebits & mask:
+                drname = '%c:\' % chr(ord('A') + d)
+                t = win32file.GetDriveType(drname)
+                if t == win32file.DRIVE_REMOVABLE:
+                    drive_list.append(drname)
+        return drive_list
+    except ImportError:
+        return []
 
 
 def start_usb_monitor():
+    """Start USB monitoring (gracefully skips on non-Windows platforms)"""
+    if platform.system() != "Windows":
+        print("[INFO] USB monitoring not available on this platform")
+        return
+    
     observers = {}
     old = set(detect_usb())
 
     def monitor():
         nonlocal old, observers
         while True:
-            new = set(detect_usb())
-            added = new - old
-            removed = old - new
+            try:
+                new = set(detect_usb())
+                added = new - old
+                removed = old - new
 
-            if added:
-                for drive in added:
-                    print(f"[USB INSERTED] {drive}")
-                    event_handler = WatcherHandler()
-                    observer = Observer()
-                    observer.schedule(event_handler, path=drive, recursive=True)
-                    observer.start()
-                    observers[drive] = observer
+                if added:
+                    for drive in added:
+                        print(f"[USB INSERTED] {drive}")
+                        event_handler = WatcherHandler()
+                        observer = Observer()
+                        observer.schedule(event_handler, path=drive, recursive=True)
+                        observer.start()
+                        observers[drive] = observer
 
-            if removed:
-                for drive in removed:
-                    print(f"[USB REMOVED] {drive}")
-                    if drive in observers:
-                        observers[drive].stop()
-                        observers[drive].join()
-                        del observers[drive]
+                if removed:
+                    for drive in removed:
+                        print(f"[USB REMOVED] {drive}")
+                        if drive in observers:
+                            observers[drive].stop()
+                            observers[drive].join()
+                            del observers[drive]
 
-            old = new
-            time.sleep(2)
+                old = new
+                time.sleep(2)
+            except Exception as e:
+                print(f"[ERROR] USB monitoring error: {e}")
 
     thread = threading.Thread(target=monitor, daemon=True)
     thread.start()
