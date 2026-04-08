@@ -4,3 +4,5 @@ numpy
 scikit-learn
 streamlit
 streamlit-autorefresh
+watchdog
+pywin32>=300; sys_platform == 'win32'
